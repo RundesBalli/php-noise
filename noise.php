@@ -188,7 +188,7 @@ while($draw_x < $x) {
   $draw_y = 0;
   while($draw_y < $y) {
     $tileColor = imagecolorallocate($im, random_int($color['r']['min'], $color['r']['max']), random_int($color['g']['min'], $color['g']['max']), random_int($color['b']['min'], $color['b']['max']));
-    imagefilledrectangle($im, $draw_x, $draw_y, $draw_x+$tileSize, $draw_y+$tileSize, $tileColor);
+    imagefilledrectangle($im, $draw_x, $draw_y, $draw_x+$tileSize-1, $draw_y+$tileSize-1, $tileColor);
     $draw_y = $draw_y+$tileSize+$borderWidth;
   }
   $draw_x = $draw_x+$tileSize+$borderWidth;
