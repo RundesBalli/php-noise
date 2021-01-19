@@ -14,7 +14,7 @@ You can either use this script via CLI or in the Browser.
 The Browser script has several high-caps to prevent too big values.  
 
 ### :clipboard: Parameters
-`$ php noise.php --help` and `$ php noise.php -h`, and `./noise.php?help` in the browser will show all possible parameters.  
+$`php noise.php --help` and $`php noise.php -h`, and `./noise.php?help` in the browser will show all possible parameters.  
 All parameters are optional. A script call in the browser requires passing parameters via GET.
 
 ```
