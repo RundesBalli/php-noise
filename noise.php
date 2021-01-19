@@ -47,6 +47,22 @@ $help.= "--borderWidth <value>\n\tWidth of the grid which is drawed between tile
 $help.= "\n";
 
 /**
+ * colorPicker function
+ * 
+ * @param  array The provided $paramColors from the user.
+ * 
+ * @return array The validated or randomly generated colors.
+ */
+function colorPicker(array $paramColors) {
+  $arg = array();
+  $arg['r'] = ((isset($paramColors['r']) AND is_numeric($paramColors['r'])) ? intval($paramColors['r']) : random_int(0, 255));
+  $arg['g'] = ((isset($paramColors['g']) AND is_numeric($paramColors['g'])) ? intval($paramColors['g']) : random_int(0, 255));
+  $arg['b'] = ((isset($paramColors['b']) AND is_numeric($paramColors['b'])) ? intval($paramColors['b']) : random_int(0, 255));
+  return $arg;
+}
+
+
+/**
  * Check if the script is called via CLI or via browser.
  */
 if(php_sapi_name() == 'cli') {
@@ -67,9 +83,8 @@ if(php_sapi_name() == 'cli') {
   if(isset($options['h']) OR isset($options['help'])) {
     die($help);
   }
-  $arg['r'] = ((isset($options['r']) AND is_numeric($options['r'])) ? intval($options['r']) : random_int(0, 255));
-  $arg['g'] = ((isset($options['g']) AND is_numeric($options['g'])) ? intval($options['g']) : random_int(0, 255));
-  $arg['b'] = ((isset($options['b']) AND is_numeric($options['b'])) ? intval($options['b']) : random_int(0, 255));
+  
+  $arg = colorPicker($options);
   $tiles = ((isset($options['tiles']) AND is_numeric($options['tiles'])) ? intval($options['tiles']) : $tiles);
   $tileSize = ((isset($options['tileSize']) AND is_numeric($options['tileSize'])) ? intval($options['tileSize']) : $tileSize);
   $borderWidth = ((isset($options['borderWidth']) AND is_numeric($options['borderWidth'])) ? intval($options['borderWidth']) : $borderWidth);
@@ -87,9 +102,8 @@ if(php_sapi_name() == 'cli') {
     echo "Please report bugs to:\nhttps://github.com/RundesBalli/php-noise/issues\n";
     die();
   }
-  $arg['r'] = ((isset($_GET['r']) AND is_numeric($_GET['r'])) ? intval($_GET['r']) : random_int(0, 255));
-  $arg['g'] = ((isset($_GET['g']) AND is_numeric($_GET['g'])) ? intval($_GET['g']) : random_int(0, 255));
-  $arg['b'] = ((isset($_GET['b']) AND is_numeric($_GET['b'])) ? intval($_GET['b']) : random_int(0, 255));
+  
+  $arg = colorPicker($_GET);
   $tiles = (((isset($_GET['tiles']) AND is_numeric($_GET['tiles'])) AND (intval($_GET['tiles']) > 0 AND intval($_GET['tiles']) <= 50)) ? intval($_GET['tiles']) : $tiles);
   $tileSize = (((isset($_GET['tileSize']) AND is_numeric($_GET['tileSize'])) AND (intval($_GET['tileSize']) > 0 AND intval($_GET['tileSize']) <= 20)) ? intval($_GET['tileSize']) : $tileSize);
   $borderWidth = (((isset($_GET['borderWidth']) AND is_numeric($_GET['borderWidth'])) AND (intval($_GET['borderWidth']) > 0 AND intval($_GET['borderWidth']) <= 15)) ? intval($_GET['borderWidth']) : $borderWidth);
