@@ -83,6 +83,7 @@ if(php_sapi_name() == 'cli') {
     header("Content-Type: text/plain");
     echo $introText;
     echo $help;
+    echo "In a browser, you can simply provide those parameters via GET.\n\n";
     echo "Please report bugs to:\nhttps://github.com/RundesBalli/php-noise/issues\n";
     die();
   }
