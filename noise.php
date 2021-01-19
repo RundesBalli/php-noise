@@ -117,7 +117,7 @@ $y = $x;
 
 /**
  * Every color should have 20 possible values around the provided parameter value.
- * If the value is too big or too small, it will be customized to the maximum or minimum values.
+ * If the value exceeds the minimum (0) or maximum (255), it will be set to the immediate maximum or minimum value instead.
  */
 if($verbose == 1) {
   echo "Selected/generated colors (min|max):\n";
@@ -135,9 +135,10 @@ foreach($arg AS $key => $val) {
     $color[$key]['max'] = 255;
   } else {
     /**
-     * If the value is between the minimum and the maximum value, it gets 20 values around it.
-     * It is randomly selected in which direction the minimum and maximum values are calculated.
-     * Sorry, I don't know how to describe it otherways.
+     * If the given value is within the enforced minimum (0) / maximum (255) boundaries (including an additional
+     * padding of 10 units from the min/max), a new boundary for the given value is calculated based on a random
+     * approximation towards the initial lower or upper boundary, thus, yielding new minima/maxima for further
+     * calculations.
      */
     if(random_int(0, 1)) {
       $color[$key]['min'] = $val-9;
