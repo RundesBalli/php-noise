@@ -31,8 +31,8 @@ $introText = "       __
     \\/_/            \\/_/\n\n";
 // http://www.network-science.de/ascii/ Font: larry3d
 $introText.= "PHP noise image generator v1.0\n\n";
-$introText.= "Visit: https://github.com/RundesBalli/php-noise\n";
-$introText.= "       https://RundesBalli.com\n\n";
+$introText.= "Visit: https://RundesBalli.com\n";
+$introText.= "       https://github.com/RundesBalli/php-noise\n\n";
 
 /**
  * Help text
@@ -83,6 +83,7 @@ if(php_sapi_name() == 'cli') {
     header("Content-Type: text/plain");
     echo $introText;
     echo $help;
+    echo "Please report bugs to:\nhttps://github.com/RundesBalli/php-noise/issues\n";
     die();
   }
   $arg['r'] = ((isset($_GET['r']) AND is_numeric($_GET['r'])) ? intval($_GET['r']) : random_int(0, 255));
@@ -198,7 +199,8 @@ while($draw_x < $x) {
 if($verbose == 1) {
   $filename = "./noise_r".$arg['r']."-g".$arg['g']."-b".$arg['b']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
   imagePNG($im, $filename);
-  echo "Output to:\n".realpath($filename)."\n";
+  echo "Output to:\n".realpath($filename)."\n\n";
+  echo "Please report bugs to:\nhttps://github.com/RundesBalli/php-noise/issues\n";
 } else {
   header('Content-Type: image/png');
   imagePNG($im);
