@@ -39,4 +39,4 @@ All parameters are optional. A script call in the browser requires passing param
 ```
 
 ## :bookmark_tabs: Examples
-For several examples, see the [ReadMe.md](https://github.com/RundesBalli/php-noise/blob/master/examples/ReadMe.md) in the examples directory.
+For several examples, see the [README.md](https://github.com/RundesBalli/php-noise/blob/master/examples/README.md) in the examples directory.
