@@ -1,14 +1,14 @@
 # :bookmark_tabs: Examples
 
-$`php noise.php -r 0 -g 50 -b 50` or  
-`./noise.php?r=0&g=50&b=50`  
-![Noise: -r 0 -g 50 -b 50](/examples/noise_r0-g20-b50-t50-tS7-bW3.png?raw=true "Noise: -r 0 -g 50 -b 50")
+$`php noise.php -r 0 -g 20 -b 50` or  
+`./noise.php?r=0&g=20&b=50`  
+![Noise: -r 0 -g 20 -b 50](/examples/noise_r0-g20-b50-t50-tS7-bW3.png?raw=true "Noise: -r 0 -g 20 -b 50")
 
 ---
 
-$`php noise.php -r 20 -g 50 -b 50` or  
-`./noise.php?r=20&g=50&b=50`  
-![Noise: -r 20 -g 50 -b 50](/examples/noise_r20-g20-b50-t50-tS7-bW3.png?raw=true "Noise: -r 20 -g 50 -b 50")
+$`php noise.php -r 20 -g 20 -b 50` or  
+`./noise.php?r=20&g=20&b=50`  
+![Noise: -r 20 -g 20 -b 50](/examples/noise_r20-g20-b50-t50-tS7-bW3.png?raw=true "Noise: -r 20 -g 20 -b 50")
 
 ---
 
@@ -30,9 +30,9 @@ $`php noise.php -r 30 -g 30 -b 30 --tileSize 10 --borderWidth 7` or
 
 ---
 
-$`php noise.php -r 150 -g 30 -b 0 --tileSize 10` or  
-`./noise.php?r=150&g=30&b=0&tileSize=10`  
-![Noise: -r 150 -g 30 -b 0 --tileSize 10](/examples/noise_r150-g30-b0-t35-tS10-bW3.png?raw=true "Noise: -r 150 -g 30 -b 0 --tileSize 10")
+$`php noise.php -r 150 -g 30 -b 0 --tiles 35 --tileSize 10` or  
+`./noise.php?r=150&g=30&b=0&tiles=35&tileSize=10`  
+![Noise: -r 150 -g 30 -b 0 --tiles 35 --tileSize 10](/examples/noise_r150-g30-b0-t35-tS10-bW3.png?raw=true "Noise: -r 150 -g 30 -b 0 --tiles 35 --tileSize 10")
 
 ---
 
