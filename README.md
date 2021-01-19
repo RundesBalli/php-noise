@@ -36,6 +36,8 @@ All parameters are optional. A script call in the browser requires passing param
 	Width of the grid which is drawed between tiles in pixels.
 	Default: 3
 	In CLI this value isn't capped. Outside of the CLI its capped to 15.
+--json
+	Saves the image and returns a JSON-String with the filename.
 ```
 
 ## :bookmark_tabs: Examples

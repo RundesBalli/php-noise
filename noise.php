@@ -44,6 +44,7 @@ $help.= "-r <value>, -g <value>, -b <value>\n\tRed, green, blue\n\tPossible valu
 $help.= "--tiles <value>\n\tNumber of tiles per row and column.\n\tThe image is square, therefore it hast \$tiles x \$tiles tiles.\n\tDefault: ".$tiles."\n\tIn CLI this value isn't capped. Outside of the CLI its capped to 50.\n";
 $help.= "--tileSize <value>\n\tWidth and height of one tile in pixels.\n\tDefault: ".$tileSize."\n\tIn CLI this value isn't capped. Outside of the CLI its capped to 20.\n";
 $help.= "--borderWidth <value>\n\tWidth of the grid which is drawed between tiles in pixels.\n\tDefault: ".$borderWidth."\n\tIn CLI this value isn't capped. Outside of the CLI its capped to 15.\n";
+$help.= "--json\n\tSaves the image and returns a JSON-String with the filename.\n\tOnly via GET in browsermode.";
 $help.= "\n";
 
 /**
@@ -61,7 +62,6 @@ function colorPicker(array $paramColors) {
   return $arg;
 }
 
-
 /**
  * Check if the script is called via CLI or via browser.
  */
@@ -75,7 +75,14 @@ if(php_sapi_name() == 'cli') {
   /**
    * Read arguments provided by CLI script call.
    */
-  $options = getopt("hr:g:b:", array("help", "tiles:", "tileSize:", "borderWidth:"));
+  $options = getopt("hr:g:b:", array("help", "tiles:", "tileSize:", "borderWidth:", "json"));
+
+  /**
+   * If the JSON parameter is provided via CLI, a note will be shown.
+   */
+  if(isset($options['json'])) {
+    die("Error: JSON only in browsermode!\n");
+  }
 
   /**
    * If help is called, show help text and exit script.
@@ -83,7 +90,7 @@ if(php_sapi_name() == 'cli') {
   if(isset($options['h']) OR isset($options['help'])) {
     die($help);
   }
-  
+
   $arg = colorPicker($options);
   $tiles = ((isset($options['tiles']) AND is_numeric($options['tiles'])) ? intval($options['tiles']) : $tiles);
   $tileSize = ((isset($options['tileSize']) AND is_numeric($options['tileSize'])) ? intval($options['tileSize']) : $tileSize);
@@ -107,6 +114,7 @@ if(php_sapi_name() == 'cli') {
   $tiles = (((isset($_GET['tiles']) AND is_numeric($_GET['tiles'])) AND (intval($_GET['tiles']) > 0 AND intval($_GET['tiles']) <= 50)) ? intval($_GET['tiles']) : $tiles);
   $tileSize = (((isset($_GET['tileSize']) AND is_numeric($_GET['tileSize'])) AND (intval($_GET['tileSize']) > 0 AND intval($_GET['tileSize']) <= 20)) ? intval($_GET['tileSize']) : $tileSize);
   $borderWidth = (((isset($_GET['borderWidth']) AND is_numeric($_GET['borderWidth'])) AND (intval($_GET['borderWidth']) > 0 AND intval($_GET['borderWidth']) <= 15)) ? intval($_GET['borderWidth']) : $borderWidth);
+  $json = (isset($_GET['json']) ? 1 : 0);
 }
 
 /**
@@ -212,14 +220,20 @@ while($draw_x < $x) {
 /**
  * Save/Output the imagefile
  */
+$filename = "noise_r".$arg['r']."-g".$arg['g']."-b".$arg['b']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
 if($verbose == 1) {
-  $filename = "./noise_r".$arg['r']."-g".$arg['g']."-b".$arg['b']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
-  imagePNG($im, $filename);
-  echo "Output to:\n".realpath($filename)."\n\n";
+  imagePNG($im, "./".$filename);
+  echo "Output to:\n".realpath("./".$filename)."\n\n";
   echo "Please report bugs to:\nhttps://github.com/RundesBalli/php-noise/issues\n";
 } else {
-  header('Content-Type: image/png');
-  imagePNG($im);
+  if($json == 1) {
+    imagePNG($im, "./images/".$filename);
+    header('Content-Type: application/json');
+    die(json_encode(array("uri" => "https://".$_SERVER['HTTP_HOST']."/images/".pathinfo($filename)['basename'])));
+  } else {
+    header('Content-Type: image/png');
+    imagePNG($im);
+  }
 }
 imagedestroy($im);
 ?>
