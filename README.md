@@ -7,6 +7,7 @@ You can install it with:
 ```
 sudo apt install php-gd
 ```
+Create a directory `mkdir images` and `chmod 0777 ./images/` it.
 
 ## :computer: Platform
 You can either use this script via CLI or in the Browser.  
