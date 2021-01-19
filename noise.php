@@ -11,13 +11,40 @@
  */
 
 /**
- * Image configuration
+ * Default configuration
  */
 $tiles = 50;       // $tiles x $tiles tiles
 $tileSize = 7;     // Pixels per tile
 $borderWidth = 3;  // Pixels
-$x = ($tiles*$tileSize)+($tiles*$borderWidth);
-$y = $x;
+
+/**
+ * Into text
+ */
+$introText = "       __                                                             
+      /\\ \\                                       __                   
+ _____\\ \\ \\___   _____              ___     ___ /\\_\\    ____     __   
+/\\ '__`\\ \\  _ `\\/\\ '__`\\  _______ /' _ `\\  / __`\\/\\ \\  /',__\\  /'__`\\ 
+\\ \\ \\L\\ \\ \\ \\ \\ \\ \\ \\L\\ \\/\\______\\/\\ \\/\\ \\/\\ \\L\\ \\ \\ \\/\\__, `\\/\\  __/ 
+ \\ \\ ,__/\\ \\_\\ \\_\\ \\ ,__/\\/______/\\ \\_\\ \\_\\ \\____/\\ \\_\\/\\____/\\ \\____\\
+  \\ \\ \\/  \\/_/\\/_/\\ \\ \\/           \\/_/\\/_/\\/___/  \\/_/\\/___/  \\/____/
+   \\ \\_\\           \\ \\_\\                                              
+    \\/_/            \\/_/\n\n";
+// http://www.network-science.de/ascii/ Font: larry3d
+$introText.= "PHP noise image generator v1.0\n\n";
+$introText.= "Visit: https://github.com/RundesBalli/php-noise\n";
+$introText.= "       https://RundesBalli.com\n\n";
+
+/**
+ * Help text
+ */
+$help = "Usage:\n";
+$help.= "All parameters are optional.\n";
+$help.= "-h, --help\n\tShows this help text and exits the script.\n";
+$help.= "-r <value>, -g <value>, -b <value>\n\tRed, green, blue\n\tPossible values: 0-255\n\tIf one of the parameters is invalid or not provided, it will be generated randomly.\n";
+$help.= "--tiles <value>\n\tNumber of tiles per row and column.\n\tThe image is square, therefore it hast \$tiles x \$tiles tiles.\n\tDefault: ".$tiles."\n\tIn CLI this value isn't capped. Outside of the CLI its capped to 50.\n";
+$help.= "--tileSize <value>\n\tWidth and height of one tile in pixels.\n\tDefault: ".$tileSize."\n\tIn CLI this value isn't capped. Outside of the CLI its capped to 20.\n";
+$help.= "--borderWidth <value>\n\tWidth of the grid which is drawed between tiles in pixels.\n\tDefault: ".$borderWidth."\n\tIn CLI this value isn't capped. Outside of the CLI its capped to 15.\n";
+$help.= "\n";
 
 /**
  * Check if the script is called via CLI or via browser.
@@ -27,31 +54,50 @@ if(php_sapi_name() == 'cli') {
    * Script is called via CLI.
    */
   $verbose = 1;
-  $arg['r'] = ((isset($argv[1]) AND is_numeric($argv[1])) ? intval($argv[1]) : random_int(0, 255));
-  $arg['g'] = ((isset($argv[2]) AND is_numeric($argv[2])) ? intval($argv[2]) : random_int(0, 255));
-  $arg['b'] = ((isset($argv[3]) AND is_numeric($argv[3])) ? intval($argv[3]) : random_int(0, 255));
-  echo "       __                                                             
-      /\\ \\                                       __                   
- _____\\ \\ \\___   _____              ___     ___ /\\_\\    ____     __   
-/\\ '__`\\ \\  _ `\\/\\ '__`\\  _______ /' _ `\\  / __`\\/\\ \\  /',__\\  /'__`\\ 
-\\ \\ \\L\\ \\ \\ \\ \\ \\ \\ \\L\\ \\/\\______\\/\\ \\/\\ \\/\\ \\L\\ \\ \\ \\/\\__, `\\/\\  __/ 
- \\ \\ ,__/\\ \\_\\ \\_\\ \\ ,__/\\/______/\\ \\_\\ \\_\\ \\____/\\ \\_\\/\\____/\\ \\____\\
-  \\ \\ \\/  \\/_/\\/_/\\ \\ \\/           \\/_/\\/_/\\/___/  \\/_/\\/___/  \\/____/
-   \\ \\_\\           \\ \\_\\                                              
-    \\/_/            \\/_/\n\n";
-  // http://www.network-science.de/ascii/ Font: larry3d
-  echo "PHP noise image generator\n\n";
-  echo "Visit: https://github.com/RundesBalli/php-noise\n";
-  echo "       https://RundesBalli.com\n\n";
+  echo $introText;
+
+  /**
+   * Read arguments provided by CLI script call.
+   */
+  $options = getopt("hr:g:b:", array("help", "tiles:", "tileSize:", "borderWidth:"));
+
+  /**
+   * If help is called, show help text and exit script.
+   */
+  if(isset($options['h']) OR isset($options['help'])) {
+    die($help);
+  }
+  $arg['r'] = ((isset($options['r']) AND is_numeric($options['r'])) ? intval($options['r']) : random_int(0, 255));
+  $arg['g'] = ((isset($options['g']) AND is_numeric($options['g'])) ? intval($options['g']) : random_int(0, 255));
+  $arg['b'] = ((isset($options['b']) AND is_numeric($options['b'])) ? intval($options['b']) : random_int(0, 255));
+  $tiles = ((isset($options['tiles']) AND is_numeric($options['tiles'])) ? intval($options['tiles']) : $tiles);
+  $tileSize = ((isset($options['tileSize']) AND is_numeric($options['tileSize'])) ? intval($options['tileSize']) : $tileSize);
+  $borderWidth = ((isset($options['borderWidth']) AND is_numeric($options['borderWidth'])) ? intval($options['borderWidth']) : $borderWidth);
+  unset($options);
 } else {
   /**
    * Script is called via browser.
    */
   $verbose = 0;
+  if(isset($_GET['h']) OR isset($_GET['help'])) {
+    header("Content-Type: text/plain");
+    echo $introText;
+    echo $help;
+    die();
+  }
   $arg['r'] = ((isset($_GET['r']) AND is_numeric($_GET['r'])) ? intval($_GET['r']) : random_int(0, 255));
   $arg['g'] = ((isset($_GET['g']) AND is_numeric($_GET['g'])) ? intval($_GET['g']) : random_int(0, 255));
   $arg['b'] = ((isset($_GET['b']) AND is_numeric($_GET['b'])) ? intval($_GET['b']) : random_int(0, 255));
+  $tiles = (((isset($_GET['tiles']) AND is_numeric($_GET['tiles'])) AND (intval($_GET['tiles']) > 0 AND intval($_GET['tiles']) <= 50)) ? intval($_GET['tiles']) : $tiles);
+  $tileSize = (((isset($_GET['tileSize']) AND is_numeric($_GET['tileSize'])) AND (intval($_GET['tileSize']) > 0 AND intval($_GET['tileSize']) <= 20)) ? intval($_GET['tileSize']) : $tileSize);
+  $borderWidth = (((isset($_GET['borderWidth']) AND is_numeric($_GET['borderWidth'])) AND (intval($_GET['borderWidth']) > 0 AND intval($_GET['borderWidth']) <= 15)) ? intval($_GET['borderWidth']) : $borderWidth);
 }
+
+/**
+ * Image parameters
+ */
+$x = ($tiles*$tileSize)+($tiles*$borderWidth);
+$y = $x;
 
 /**
  * Every color should have 20 possible values around the provided parameter value.
@@ -116,7 +162,7 @@ if($verbose == 1) {
 $im = imagecreatetruecolor($x, $y);
 
 /**
- * Draw border-grid between tiles
+ * Draw grid between tiles
  */
 $draw_x = 0;
 $draw_y = 0;
@@ -150,7 +196,7 @@ while($draw_x < $x) {
  * Save/Output the imagefile
  */
 if($verbose == 1) {
-  $filename = "./noise-r".$arg['r']."-g".$arg['g']."-b".$arg['b']."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
+  $filename = "./noise_r".$arg['r']."-g".$arg['g']."-b".$arg['b']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
   imagePNG($im, $filename);
   echo "Output to:\n".realpath($filename)."\n";
 } else {
