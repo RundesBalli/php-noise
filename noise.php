@@ -222,8 +222,8 @@ while($draw_x < $x) {
  */
 $filename = "noise_r".$arg['r']."-g".$arg['g']."-b".$arg['b']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
 if($verbose == 1) {
-  imagePNG($im, "./".$filename);
-  echo "Output to:\n".realpath("./".$filename)."\n\n";
+  imagePNG($im, "./images/".$filename);
+  echo "Output to:\n".realpath("./images/".$filename)."\n\n";
   echo "Please report bugs to:\nhttps://github.com/RundesBalli/php-noise/issues\n";
 } else {
   if($json == 1) {
