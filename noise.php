@@ -56,9 +56,9 @@ $help.= "\n";
  */
 function colorPicker(array $paramColors) {
   $arg = array();
-  $arg['r'] = ((isset($paramColors['r']) AND is_numeric($paramColors['r'])) ? intval($paramColors['r']) : random_int(0, 255));
-  $arg['g'] = ((isset($paramColors['g']) AND is_numeric($paramColors['g'])) ? intval($paramColors['g']) : random_int(0, 255));
-  $arg['b'] = ((isset($paramColors['b']) AND is_numeric($paramColors['b'])) ? intval($paramColors['b']) : random_int(0, 255));
+  $arg['r'] = (((isset($paramColors['r']) AND is_numeric($paramColors['r'])) AND (intval($paramColors['r']) >= 0 AND intval($paramColors['r']) <= 255)) ? intval($paramColors['r']) : random_int(0, 255));
+  $arg['g'] = (((isset($paramColors['g']) AND is_numeric($paramColors['g'])) AND (intval($paramColors['g']) >= 0 AND intval($paramColors['g']) <= 255)) ? intval($paramColors['g']) : random_int(0, 255));
+  $arg['b'] = (((isset($paramColors['b']) AND is_numeric($paramColors['b'])) AND (intval($paramColors['b']) >= 0 AND intval($paramColors['b']) <= 255)) ? intval($paramColors['b']) : random_int(0, 255));
   return $arg;
 }
 
