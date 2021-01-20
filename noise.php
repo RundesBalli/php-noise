@@ -113,7 +113,7 @@ if(php_sapi_name() == 'cli') {
   $arg = colorPicker($_GET);
   $tiles = (((isset($_GET['tiles']) AND is_numeric($_GET['tiles'])) AND (intval($_GET['tiles']) > 0 AND intval($_GET['tiles']) <= 50)) ? intval($_GET['tiles']) : $tiles);
   $tileSize = (((isset($_GET['tileSize']) AND is_numeric($_GET['tileSize'])) AND (intval($_GET['tileSize']) > 0 AND intval($_GET['tileSize']) <= 20)) ? intval($_GET['tileSize']) : $tileSize);
-  $borderWidth = (((isset($_GET['borderWidth']) AND is_numeric($_GET['borderWidth'])) AND (intval($_GET['borderWidth']) > 0 AND intval($_GET['borderWidth']) <= 15)) ? intval($_GET['borderWidth']) : $borderWidth);
+  $borderWidth = (((isset($_GET['borderWidth']) AND is_numeric($_GET['borderWidth'])) AND (intval($_GET['borderWidth']) >= 0 AND intval($_GET['borderWidth']) <= 15)) ? intval($_GET['borderWidth']) : $borderWidth);
   $json = (isset($_GET['json']) ? 1 : 0);
 }
 
