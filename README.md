@@ -1,5 +1,6 @@
 # :milky_way: php-noise
-A script for generating (random) noise background images.
+A script for generating (random) noise background images.  
+:globe_with_meridians: Homepage: [php-noise.com](https://php-noise.com)  
 
 ## :wrench: Requirements
 `php-gd` is required for this script to work.  
