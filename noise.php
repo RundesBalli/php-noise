@@ -6,7 +6,7 @@
  * 
  * @author    RundesBalli <github@rundesballi.com>
  * @copyright 2021 RundesBalli
- * @version   1.0
+ * @version   1.1
  * @see       https://github.com/RundesBalli/php-noise
  */
 
@@ -30,7 +30,7 @@ $introText = "       __
    \\ \\_\\           \\ \\_\\                                              
     \\/_/            \\/_/\n\n";
 // http://www.network-science.de/ascii/ Font: larry3d
-$introText.= "PHP noise image generator v1.0\n\n";
+$introText.= "PHP noise image generator v1.1\n\n";
 $introText.= "Visit: https://RundesBalli.com\n";
 $introText.= "       https://github.com/RundesBalli/php-noise\n\n";
 
