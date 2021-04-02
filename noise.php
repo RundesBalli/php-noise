@@ -136,13 +136,13 @@ if(php_sapi_name() == 'cli') {
   /**
    * If a hex code is provided, use the hex code and ignore the rgb values.
    */
-  if(isset($options['hex'])) {
+  if(!empty($options['hex'])) {
     $hex = hex2rgb($options['hex']);
     if($hex) {
       $arg = colorPicker($hex);
       $filename = "noise_hex-".$hex['hex']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
     } else {
-      $arg = colorPicker();
+      $arg = colorPicker($options);
     }
   } else {
     $arg = colorPicker($options);
@@ -169,13 +169,13 @@ if(php_sapi_name() == 'cli') {
   /**
    * If a hex code is provided, use the hex code and ignore the rgb values.
    */
-  if(isset($_GET['hex'])) {
+  if(!empty($_GET['hex'])) {
     $hex = hex2rgb($_GET['hex']);
     if($hex) {
       $arg = colorPicker($hex);
       $filename = "noise_hex-".$hex['hex']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
     } else {
-      $arg = colorPicker();
+      $arg = colorPicker($_GET);
     }
   } else {
     $arg = colorPicker($_GET);
