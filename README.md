@@ -1,6 +1,13 @@
-# :milky_way: php-noise
-A script for generating (random) noise background images.  
-:globe_with_meridians: Homepage: [php-noise.com](https://php-noise.com) - :octocat: [GitHub Repository](https://github.com/RundesBalli/php-noise.com/)  
+<h1 align="center">php-noise</h1>
+<p align="center">A script for generating (random) noise background images.  
+:globe_with_meridians: Homepage: [php-noise.com](https://php-noise.com) - :octocat: [GitHub Repository](https://github.com/RundesBalli/php-noise.com/)</p>  
+
+<p align="center">
+![Noise](/examples/noise_1.png?raw=true "Noise")
+![Noise](/examples/noise_2.png?raw=true "Noise")
+![Noise](/examples/noise_3.png?raw=true "Noise")
+![Noise](/examples/noise_4.png?raw=true "Noise")
+</p>
 
 ## :wrench: Requirements
 `php-gd` is required for this script to work.  
