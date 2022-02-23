@@ -278,7 +278,9 @@ if($mode == "around") {
       }
     }
   }
-  echo "Possible colors generated: ".count($colors)."\n\n";
+  if($verbose == 1) {
+    echo "Possible colors generated: ".count($colors)."\n\n";
+  }
 
   /**
    * Generate the random border color.
@@ -302,7 +304,9 @@ if($mode == "around") {
    */
   if(isset($colors[array_search([$borderColor['r'], $borderColor['g'], $borderColor['b']], $colors, true)])) {
     unset($colors[array_search([$borderColor['r'], $borderColor['g'], $borderColor['b']], $colors, true)]);
-    echo "Info: Border color deleted from possible colors array.\n\n";
+    if($verbose == 1) {
+      echo "Info: Border color deleted from possible colors array.\n\n";
+    }
   }
 } else {
   /**
