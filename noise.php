@@ -5,17 +5,18 @@
  * A script for generating (random) noise background images.
  * 
  * @author    RundesBalli <github@rundesballi.com>
- * @copyright 2021 RundesBalli
- * @version   1.1
+ * @copyright 2022 RundesBalli
+ * @version   1.2
  * @see       https://github.com/RundesBalli/php-noise
  */
 
 /**
  * Default configuration
  */
-$tiles = 50;       // $tiles x $tiles tiles
-$tileSize = 7;     // Pixels per tile
-$borderWidth = 3;  // Pixels
+$tiles = 50;          // $tiles x $tiles tiles
+$tileSize = 7;        // Pixels per tile
+$borderWidth = 3;     // Pixels
+$mode = "brightness"; // Color calculation mode: brightness, around
 
 /**
  * Into text
@@ -30,7 +31,7 @@ $introText = "       __
    \\ \\_\\           \\ \\_\\                                              
     \\/_/            \\/_/\n\n";
 // http://www.network-science.de/ascii/ Font: larry3d
-$introText.= "PHP noise image generator v1.1\n\n";
+$introText.= "PHP noise image generator v1.2\n\n";
 $introText.= "Visit: https://RundesBalli.com\n";
 $introText.= "       https://github.com/RundesBalli/php-noise\n\n";
 
@@ -45,6 +46,7 @@ $help.= "-r <value>, -g <value>, -b <value>\n\tRed, green, blue\n\tPossible valu
 $help.= "--tiles <value>\n\tNumber of tiles per row and column.\n\tThe image is square, therefore it hast \$tiles x \$tiles tiles.\n\tDefault: ".$tiles."\n\tIn CLI this value isn't capped. Outside of the CLI its capped to 50.\n";
 $help.= "--tileSize <value>\n\tWidth and height of one tile in pixels.\n\tDefault: ".$tileSize."\n\tIn CLI this value isn't capped. Outside of the CLI its capped to 20.\n";
 $help.= "--borderWidth <value>\n\tWidth of the grid which is drawed between tiles in pixels.\n\tDefault: ".$borderWidth."\n\tIn CLI this value isn't capped. Outside of the CLI its capped to 15.\n";
+$help.= "--mode <value>\n\tColor calculation mode.\n\t1. brightness:\tCalculates the colors by brightness adjustments based on the reference color.\n\t2. around:\tCalculates the colors randomly around the reference color.\n\tDefault: ".$mode."\n";
 $help.= "--json\n\tSaves the image and returns a JSON-String with the filename.\n\tOnly via GET in browsermode.";
 $help.= "\n";
 
@@ -117,7 +119,7 @@ if(php_sapi_name() == 'cli') {
   /**
    * Read arguments provided by CLI script call.
    */
-  $options = getopt("hr:g:b:", array("help", "tiles:", "tileSize:", "borderWidth:", "json", "hex:"));
+  $options = getopt("hr:g:b:", array("help", "tiles:", "tileSize:", "borderWidth:", "mode:", "json", "hex:"));
 
   /**
    * If the JSON parameter is provided via CLI, a note will be shown.
@@ -134,13 +136,25 @@ if(php_sapi_name() == 'cli') {
   }
 
   /**
+   * Checks the color calculation mode
+   */
+  if(!empty($options['mode'])) {
+    if($options['mode'] == "brightness") {
+      $mode = "brightness";
+    } elseif($options['mode'] == "around") {
+      $mode = "around";
+    }
+    // No else: Mode is set by default options.
+  }
+
+  /**
    * If a hex code is provided, use the hex code and ignore the rgb values.
    */
   if(!empty($options['hex'])) {
     $hex = hex2rgb($options['hex']);
     if($hex) {
       $arg = colorPicker($hex);
-      $filename = "noise_hex-".$hex['hex']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
+      $filename = "noise_hex-".$hex['hex']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."-m".($mode == "around" ? "A" : "B")."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
     } else {
       $arg = colorPicker($options);
     }
@@ -165,7 +179,19 @@ if(php_sapi_name() == 'cli') {
     echo "Please report bugs to:\nhttps://github.com/RundesBalli/php-noise/issues\n";
     die();
   }
-  
+
+  /**
+   * Checks the color calculation mode
+   */
+  if(!empty($_GET['mode'])) {
+    if($_GET['mode'] == "brightness") {
+      $mode = "brightness";
+    } elseif($_GET['mode'] == "around") {
+      $mode = "around";
+    }
+    // No else: Mode is set by default options.
+  }
+
   /**
    * If a hex code is provided, use the hex code and ignore the rgb values.
    */
@@ -173,7 +199,7 @@ if(php_sapi_name() == 'cli') {
     $hex = hex2rgb($_GET['hex']);
     if($hex) {
       $arg = colorPicker($hex);
-      $filename = "noise_hex-".$hex['hex']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
+      $filename = "noise_hex-".$hex['hex']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."-m".($mode == "around" ? "A" : "B")."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
     } else {
       $arg = colorPicker($_GET);
     }
@@ -194,61 +220,171 @@ $x = ($tiles*$tileSize)+($tiles*$borderWidth);
 $y = $x;
 
 /**
- * Every color should have 20 possible values around the provided parameter value.
- * If the value exceeds the minimum (0) or maximum (255), it will be set to the immediate maximum or minimum value instead.
+ * Color calculation mode
  */
-if($verbose == 1) {
-  echo "Selected/generated colors (min|max):\n";
-}
-$color = array();
-foreach($arg AS $key => $val) {
+if($mode == "around") {
+  /**
+   * "around" mode
+   * 
+   * Calculates the colors randomly around the reference color.
+   * Every color should have 20 possible values around the provided parameter value.
+   * If the value exceeds the minimum (0) or maximum (255), it will be set to the immediate maximum or minimum value instead.
+   */
   if($verbose == 1) {
-    echo strtoupper($key).": ".$val." ";
+    echo "Selected/generated colors (min|max):\n";
   }
-  if($val < 10) {
-    $color[$key]['min'] = 0;
-    $color[$key]['max'] = 19;
-  } elseif($val > 245) {
-    $color[$key]['min'] = 236;
-    $color[$key]['max'] = 255;
-  } else {
-    /**
-     * If the given value is within the enforced minimum (0) / maximum (255) boundaries (including an additional
-     * padding of 10 units from the min/max), a new boundary for the given value is calculated based on a random
-     * approximation towards the initial lower or upper boundary, thus, yielding new minima/maxima for further
-     * calculations.
-     */
-    if(random_int(0, 1)) {
-      $color[$key]['min'] = $val-9;
-      $color[$key]['max'] = $val+10;
+  $color = array();
+  foreach($arg AS $key => $val) {
+    if($verbose == 1) {
+      echo strtoupper($key).": ".$val." ";
+    }
+    if($val < 10) {
+      $color[$key]['min'] = 0;
+      $color[$key]['max'] = 19;
+    } elseif($val > 245) {
+      $color[$key]['min'] = 236;
+      $color[$key]['max'] = 255;
     } else {
-      $color[$key]['min'] = $val-10;
-      $color[$key]['max'] = $val+9;
+      /**
+       * If the given value is within the enforced minimum (0) / maximum (255) boundaries (including an additional
+       * padding of 10 units from the min/max), a new boundary for the given value is calculated based on a random
+       * approximation towards the initial lower or upper boundary, thus, yielding new minima/maxima for further
+       * calculations.
+       */
+      if(random_int(0, 1)) {
+        $color[$key]['min'] = $val-9;
+        $color[$key]['max'] = $val+10;
+      } else {
+        $color[$key]['min'] = $val-10;
+        $color[$key]['max'] = $val+9;
+      }
+    }
+    if($verbose == 1) {
+      echo "(".$color[$key]['min']."|".$color[$key]['max'].")\n";
     }
   }
   if($verbose == 1) {
-    echo "(".$color[$key]['min']."|".$color[$key]['max'].")\n";
+    echo "\n";
   }
-}
-if($verbose == 1) {
-  echo "\n";
-}
 
-/**
- * Generate the random border color.
- */
-$borderColor = array();
-if($verbose == 1) {
-  echo "Generated border color:\n";
-}
-foreach($color AS $key => $val) {
-  $borderColor[$key] = random_int($val['min'], $val['max']);
-  if($verbose == 1) {
-    echo strtoupper($key).": ".$borderColor[$key]."\n";
+  /**
+   * Generate all possible color arrays.
+   */
+  $colors = array();
+  for($i = $color['r']['min']; $i <= $color['r']['max']; $i++) {
+    for($j = $color['g']['min']; $j <= $color['g']['max']; $j++) {
+      for($k = $color['b']['min']; $k <= $color['b']['max']; $k++) {
+        $colors[] = [$i, $j, $k];
+      }
+    }
   }
-}
-if($verbose == 1) {
-  echo "\n";
+  echo "Possible colors generated: ".count($colors)."\n\n";
+
+  /**
+   * Generate the random border color.
+   */
+  if($verbose == 1) {
+    echo "Generated border color:\n";
+  }
+  $borderColor = array();
+  foreach($color AS $key => $val) {
+    $borderColor[$key] = random_int($val['min'], $val['max']);
+    if($verbose == 1) {
+      echo strtoupper($key).": ".$borderColor[$key]."\n";
+    }
+  }
+  if($verbose == 1) {
+    echo "\n";
+  }
+
+  /**
+   * Delete the border color from the possible colors array.
+   */
+  if(isset($colors[array_search([$borderColor['r'], $borderColor['g'], $borderColor['b']], $colors, true)])) {
+    unset($colors[array_search([$borderColor['r'], $borderColor['g'], $borderColor['b']], $colors, true)]);
+    echo "Info: Border color deleted from possible colors array.\n\n";
+  }
+} else {
+  /**
+   * "brightness" mode
+   * 
+   * Calculates the colors by brightness adjustments based on the reference color.
+   */
+
+  $multiplicator = 1.5;
+  $steps = 5;
+
+  /**
+   * User selected or random generated color
+   */
+  $r = $arg['r'];
+  $g = $arg['g'];
+  $b = $arg['b'];
+  if($verbose == 1) {
+    echo "Reference color:\nR: ".$r."\nG: ".$g."\nB: ".$b."\n\n";
+  }
+
+  $colors = array();
+
+  /**
+   * Generate color shades beyond the reference color.
+   */
+  for($i=$steps;$i>=1;$i--) {
+    $r1 = round($r-($r/100*($i*$multiplicator)), 0);
+    if($r1 < 0) {
+      $r1 = 0;
+    }
+    $g1 = round($g-($g/100*($i*$multiplicator)), 0);
+    if($g1 < 0) {
+      $g1 = 0;
+    }
+    $b1 = round($b-($b/100*($i*$multiplicator)), 0);
+    if($b1 < 0) {
+      $b1 = 0;
+    }
+    $colors[] = [$r1, $g1, $b1];
+  }
+
+  /**
+   * If there are no borders, the script can use the reference color in the color spectre.
+   * Otherwise the reference color is used as $borderColor.
+   */
+  if($borderWidth == 0) {
+    $colors[] = [$r, $g, $b];
+  } else {
+    if($verbose == 1) {
+      echo "Border color: same as reference color.\nR: ".$r."\nG: ".$g."\nB: ".$b."\n\n";
+    }
+    $borderColor = ["r" => $r, "g" => $g, "b" => $b];
+  }
+
+  /**
+   * Generate color shades above the reference color.
+   */
+  for($i=1;$i<=$steps;$i++) {
+    $r1 = round($r+($r/100*($i*$multiplicator)), 0);
+    if($r1 > 255) {
+      $r1 = 255;
+    }
+    $g1 = round($g+($g/100*($i*$multiplicator)), 0);
+    if($g1 > 255) {
+      $g1 = 255;
+    }
+    $b1 = round($b+($b/100*($i*$multiplicator)), 0);
+    if($b1 > 255) {
+      $b1 = 255;
+    }
+    $colors[] = [$r1,$g1,$b1];
+  }
+
+  /**
+   * It is possible by percentage calculation that there are duplicate values in the array. These are cleaned up here.
+   */
+  $colors = array_unique($colors, SORT_REGULAR);
+
+  if($verbose == 1) {
+    echo "Possible colors generated: ".count($colors)."\n\n";
+  }
 }
 
 /**
@@ -257,19 +393,21 @@ if($verbose == 1) {
 $im = imagecreatetruecolor($x, $y);
 
 /**
- * Draw grid between tiles
+ * Draw grid between tiles, if borderWidth > 0
  */
-$draw_x = 0;
-$draw_y = 0;
-while($draw_x < $x) {
-  $draw_x = $draw_x + $tileSize;
-  imagefilledrectangle($im, $draw_x, 0, ($draw_x + ($borderWidth-1)), $y, imagecolorallocate($im, $borderColor['r'], $borderColor['g'], $borderColor['b']));
-  $draw_x = $draw_x + $borderWidth;
-}
-while($draw_y < $y) {
-  $draw_y = $draw_y + $tileSize;
-  imagefilledrectangle($im, 0, $draw_y, $x, ($draw_y + ($borderWidth-1)), imagecolorallocate($im, $borderColor['r'], $borderColor['g'], $borderColor['b']));
-  $draw_y = $draw_y + $borderWidth;
+if($borderWidth > 0) {
+  $draw_x = 0;
+  $draw_y = 0;
+  while($draw_x < $x) {
+    $draw_x = $draw_x + $tileSize;
+    imagefilledrectangle($im, $draw_x, 0, ($draw_x + ($borderWidth-1)), $y, imagecolorallocate($im, $borderColor['r'], $borderColor['g'], $borderColor['b']));
+    $draw_x = $draw_x + $borderWidth;
+  }
+  while($draw_y < $y) {
+    $draw_y = $draw_y + $tileSize;
+    imagefilledrectangle($im, 0, $draw_y, $x, ($draw_y + ($borderWidth-1)), imagecolorallocate($im, $borderColor['r'], $borderColor['g'], $borderColor['b']));
+    $draw_y = $draw_y + $borderWidth;
+  }
 }
 
 /**
@@ -280,7 +418,8 @@ $draw_y = 0;
 while($draw_x < $x) {
   $draw_y = 0;
   while($draw_y < $y) {
-    $tileColor = imagecolorallocate($im, random_int($color['r']['min'], $color['r']['max']), random_int($color['g']['min'], $color['g']['max']), random_int($color['b']['min'], $color['b']['max']));
+    $randomColor = $colors[array_rand($colors)];
+    $tileColor = imagecolorallocate($im, $randomColor[0], $randomColor[1], $randomColor[2]);
     imagefilledrectangle($im, $draw_x, $draw_y, $draw_x+$tileSize-1, $draw_y+$tileSize-1, $tileColor);
     $draw_y = $draw_y+$tileSize+$borderWidth;
   }
@@ -294,7 +433,7 @@ if(empty($filename)) {
   /**
    * If a valid hex value is provided, the filename will be generated above.
    */
-  $filename = "noise_r".$arg['r']."-g".$arg['g']."-b".$arg['b']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
+  $filename = "noise_r".$arg['r']."-g".$arg['g']."-b".$arg['b']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."-m".($mode == "around" ? "A" : "B")."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
 }
 if($verbose == 1) {
   imagePNG($im, "./images/".$filename);
