@@ -7,8 +7,14 @@
 <img src="/examples/noise_2.png?raw=true"> 
 <img src="/examples/noise_3.png?raw=true"> 
 <img src="/examples/noise_4.png?raw=true"> 
-<img src="/examples/noise_5.png?raw=true"> 
-<img src="/examples/noise_6.png?raw=true">
+<img src="/examples/noise_5.png?raw=true">
+</p>
+<p align="center">
+<img src="/examples/noise_11.png?raw=true"> 
+<img src="/examples/noise_22.png?raw=true"> 
+<img src="/examples/noise_33.png?raw=true"> 
+<img src="/examples/noise_44.png?raw=true"> 
+<img src="/examples/noise_55.png?raw=true">
 </p>
 
 ## :wrench: Requirements
