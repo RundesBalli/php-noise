@@ -3,10 +3,12 @@
 :globe_with_meridians: Homepage: [php-noise.com](https://php-noise.com) - :octocat: [GitHub Repository](https://github.com/RundesBalli/php-noise.com/)</p>  
 
 <p align="center">
-![Noise](/examples/noise_1.png?raw=true "Noise")
-![Noise](/examples/noise_2.png?raw=true "Noise")
-![Noise](/examples/noise_3.png?raw=true "Noise")
-![Noise](/examples/noise_4.png?raw=true "Noise")
+<img src="/examples/noise_1.png?raw=true"> 
+<img src="/examples/noise_2.png?raw=true"> 
+<img src="/examples/noise_3.png?raw=true"> 
+<img src="/examples/noise_4.png?raw=true"> 
+<img src="/examples/noise_5.png?raw=true"> 
+<img src="/examples/noise_6.png?raw=true">
 </p>
 
 ## :wrench: Requirements
