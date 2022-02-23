@@ -15,7 +15,7 @@
  */
 $tiles = 50;          // $tiles x $tiles tiles
 $tileSize = 7;        // Pixels per tile
-$borderWidth = 3;     // Pixels
+$borderWidth = 0;     // Width of the grid between tiles
 $mode = "brightness"; // Color calculation mode: brightness, around
 
 /**
