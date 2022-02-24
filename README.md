@@ -1,6 +1,6 @@
 <h1 align="center">php-noise</h1>
-<p align="center">A script for generating (random) noise background images.  
-:globe_with_meridians: Homepage: [php-noise.com](https://php-noise.com) - :octocat: [GitHub Repository](https://github.com/RundesBalli/php-noise.com/)</p>  
+<p align="center">A script for generating (random) noise background images.<br>
+:globe_with_meridians: Homepage: <a href="https://php-noise.com">php-noise.com</a> - :octocat: <a href="https://github.com/RundesBalli/php-noise.com/">GitHub Repository</a></p>
 
 <p align="center">
 <img src="/examples/noise_1.png?raw=true"> 
