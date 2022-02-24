@@ -17,6 +17,8 @@ $tiles = 50;          // $tiles x $tiles tiles
 $tileSize = 7;        // Pixels per tile
 $borderWidth = 0;     // Width of the grid between tiles
 $mode = "brightness"; // Color calculation mode: brightness, around
+$multiplicator = 1.5; // Multiplicator for calculation in brightness mode
+$steps = 5;           // Number of colors above and below the reference color in brightness mode
 
 /**
  * Into text
@@ -47,6 +49,8 @@ $help.= "--tiles <value>\n\tNumber of tiles per row and column.\n\tThe image is 
 $help.= "--tileSize <value>\n\tWidth and height of one tile in pixels.\n\tDefault: ".$tileSize."\n\tIn CLI this value isn't capped. Outside of the CLI its capped to 20.\n";
 $help.= "--borderWidth <value>\n\tWidth of the grid which is drawed between tiles in pixels.\n\tDefault: ".$borderWidth."\n\tIn CLI this value isn't capped. Outside of the CLI its capped to 15.\n";
 $help.= "--mode <value>\n\tColor calculation mode.\n\t1. brightness:\tCalculates the colors by brightness adjustments based on the reference color.\n\t2. around:\tCalculates the colors randomly around the reference color.\n\tDefault: ".$mode."\n";
+$help.= "--multi <value> (only in brightness mode)\n\tIncreases or decreases the percentage spacing between colors.\n\tAllowed values are positive floating point numbers with one decimal place.\n\tDefault: ".$multiplicator."\n";
+$help.= "--steps <value> (only in brightness mode)\n\tIncreases or decreases the number of possible colors above and below the reference color.\n\tDefault: ".$steps."\n\tIn CLI this value isn't capped. Outside of the CLI its capped to 50.\n";
 $help.= "--json\n\tSaves the image and returns a JSON-String with the filename.\n\tOnly via GET in browsermode.";
 $help.= "\n";
 
@@ -119,7 +123,7 @@ if(php_sapi_name() == 'cli') {
   /**
    * Read arguments provided by CLI script call.
    */
-  $options = getopt("hr:g:b:", array("help", "tiles:", "tileSize:", "borderWidth:", "mode:", "json", "hex:"));
+  $options = getopt("hr:g:b:", array("help", "tiles:", "tileSize:", "borderWidth:", "mode:", "json", "hex:", "multi:", "steps:"));
 
   /**
    * If the JSON parameter is provided via CLI, a note will be shown.
@@ -148,13 +152,37 @@ if(php_sapi_name() == 'cli') {
   }
 
   /**
+   * Check parameters for brightness mode.
+   */
+  if($mode == "brightness") {
+    if(!empty($options['multi'])) {
+      /**
+       * Check if the provided multiplicator is above 0.
+       */
+      $newMulti = round(floatval($options['multi']), 1);
+      if($newMulti > 0) {
+        $multiplicator = $newMulti;
+      }
+    }
+    if(!empty($options['steps'])) {
+      /**
+       * Check if the provided steps value is above 0.
+       */
+      $newSteps = intval($options['steps']);
+      if($newSteps > 0) {
+        $steps = $newSteps;
+      }
+    }
+  }
+
+  /**
    * If a hex code is provided, use the hex code and ignore the rgb values.
    */
   if(!empty($options['hex'])) {
     $hex = hex2rgb($options['hex']);
     if($hex) {
       $arg = colorPicker($hex);
-      $filename = "noise_hex-".$hex['hex']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."-m".($mode == "around" ? "A" : "B")."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
+      $filename = "noise_hex-".$hex['hex']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."-m".($mode == "around" ? "A" : "B-mu".$multiplicator."-st".$steps)."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
     } else {
       $arg = colorPicker($options);
     }
@@ -193,13 +221,37 @@ if(php_sapi_name() == 'cli') {
   }
 
   /**
+   * Check parameters for brightness mode.
+   */
+  if($mode == "brightness") {
+    if(!empty($_GET['multi'])) {
+      /**
+       * Check if the provided multiplicator is above 0.
+       */
+      $newMulti = round(floatval($_GET['multi']), 1);
+      if($newMulti > 0) {
+        $multiplicator = $newMulti;
+      }
+    }
+    if(!empty($_GET['steps'])) {
+      /**
+       * Check if the provided steps value is above 0 and below or equal to 50.
+       */
+      $newSteps = intval($_GET['steps']);
+      if($newSteps > 0 AND $newSteps <= 50) {
+        $steps = $newSteps;
+      }
+    }
+  }
+
+  /**
    * If a hex code is provided, use the hex code and ignore the rgb values.
    */
   if(!empty($_GET['hex'])) {
     $hex = hex2rgb($_GET['hex']);
     if($hex) {
       $arg = colorPicker($hex);
-      $filename = "noise_hex-".$hex['hex']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."-m".($mode == "around" ? "A" : "B")."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
+      $filename = "noise_hex-".$hex['hex']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."-m".($mode == "around" ? "A" : "B-mu".$multiplicator."-st".$steps)."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
     } else {
       $arg = colorPicker($_GET);
     }
@@ -314,9 +366,6 @@ if($mode == "around") {
    * 
    * Calculates the colors by brightness adjustments based on the reference color.
    */
-
-  $multiplicator = 1.5;
-  $steps = 5;
 
   /**
    * User selected or random generated color
@@ -437,7 +486,7 @@ if(empty($filename)) {
   /**
    * If a valid hex value is provided, the filename will be generated above.
    */
-  $filename = "noise_r".$arg['r']."-g".$arg['g']."-b".$arg['b']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."-m".($mode == "around" ? "A" : "B")."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
+  $filename = "noise_r".$arg['r']."-g".$arg['g']."-b".$arg['b']."-t".$tiles."-tS".$tileSize."-bW".$borderWidth."-m".($mode == "around" ? "A" : "B-mu".$multiplicator."-st".$steps)."_".md5(date("Y-m-d_H-i-s").microtime()).".png";
 }
 if($verbose == 1) {
   imagePNG($im, "./images/".$filename);
