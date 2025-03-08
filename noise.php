@@ -51,8 +51,7 @@ $help.= "--borderWidth <value>\n\tWidth of the grid which is drawed between tile
 $help.= "--mode <value>\n\tColor calculation mode.\n\t1. brightness:\tCalculates the colors by brightness adjustments based on the reference color.\n\t2. around:\tCalculates the colors randomly around the reference color.\n\tDefault: ".$mode."\n";
 $help.= "--multi <value> (only in brightness mode)\n\tIncreases or decreases the percentage spacing between colors.\n\tAllowed values are positive floating point numbers with one decimal place.\n\tDefault: ".$multiplicator."\n";
 $help.= "--steps <value> (only in brightness mode)\n\tIncreases or decreases the number of possible colors above and below the reference color.\n\tDefault: ".$steps."\n\tIn CLI this value isn't capped. Outside of the CLI its capped to 50.\n";
-$help.= "--json\n\tSaves the image and returns a JSON-String with the filename.\n\tOnly via GET in browsermode.\n";
-$help.= "--base64\n\tOnly in combination with the JSON output.\n\tExports the base64 string of the image in the base64 field in the JSON output.";
+$help.= "--base64\n\tExports the base64 string of the image in a JSON output.";
 $help.= "\n";
 
 /**
@@ -124,14 +123,7 @@ if(php_sapi_name() == 'cli') {
   /**
    * Read arguments provided by CLI script call.
    */
-  $options = getopt("hr:g:b:", array("help", "tiles:", "tileSize:", "borderWidth:", "mode:", "json", "hex:", "multi:", "steps:"));
-
-  /**
-   * If the JSON parameter is provided via CLI, a note will be shown.
-   */
-  if(isset($options['json'])) {
-    die("Error: JSON only in browsermode!\n");
-  }
+  $options = getopt("hr:g:b:", array("help", "tiles:", "tileSize:", "borderWidth:", "mode:", "hex:", "multi:", "steps:"));
 
   /**
    * If help is called, show help text and exit script.
@@ -263,7 +255,7 @@ if(php_sapi_name() == 'cli') {
   $tiles = (((isset($_GET['tiles']) AND is_numeric($_GET['tiles'])) AND (intval($_GET['tiles']) > 0 AND intval($_GET['tiles']) <= 50)) ? intval($_GET['tiles']) : $tiles);
   $tileSize = (((isset($_GET['tileSize']) AND is_numeric($_GET['tileSize'])) AND (intval($_GET['tileSize']) > 0 AND intval($_GET['tileSize']) <= 20)) ? intval($_GET['tileSize']) : $tileSize);
   $borderWidth = (((isset($_GET['borderWidth']) AND is_numeric($_GET['borderWidth'])) AND (intval($_GET['borderWidth']) >= 0 AND intval($_GET['borderWidth']) <= 15)) ? intval($_GET['borderWidth']) : $borderWidth);
-  $json = (isset($_GET['json']) ? 1 : 0);
+  $base64 = (isset($_GET['base64']) ? 1 : 0);
 }
 
 /**
@@ -494,15 +486,13 @@ if($verbose == 1) {
   echo "Output to:\n".realpath("./images/".$filename)."\n\n";
   echo "Please report bugs to:\nhttps://github.com/RundesBalli/php-noise/issues\n";
 } else {
-  if($json == 1) {
-    imagePNG($im, "./images/".$filename);
+  if($base64 == 1) {
+    imagePNG($im, "/tmp/".$filename);
     header('Content-Type: application/json');
-    $output = array(
-      "uri" => "https://".$_SERVER['HTTP_HOST']."/images/".pathinfo($filename)['basename'],
-    );
-    if(isset($_GET['base64'])) {
-      $output['base64'] = "data:image/png;base64,".base64_encode(file_get_contents("./images/".$filename));
-    }
+    $output = [
+      'base64' => "data:image/png;base64,".base64_encode(file_get_contents("/tmp/".$filename))
+    ];
+    unlink("/tmp/".$filename);
     die(json_encode($output));
   } else {
     header('Content-Type: image/png');
